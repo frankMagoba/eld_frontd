@@ -10,6 +10,7 @@ export default defineConfig({
   },
   preview: {
     port: 8080,
-    host: true
+    host: true,
+    allowedHosts: ['eld-frontd.onrender.com', 'localhost']
   }
 })
