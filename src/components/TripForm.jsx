@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { tripService } from '../utils/api';
-import Spinner from './Spinner';
 import Loader from './Loader';
 
 const TripForm = ({ onTripCreated }) => {
@@ -15,6 +14,17 @@ const TripForm = ({ onTripCreated }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  const resetForm = () => {
+    setFormData({
+      current_location: '',
+      pickup_location: '',
+      dropoff_location: '',
+      current_cycle_used: 0
+    });
+    setFormErrors({});
+    setError('');
+  };
   
   const validateField = (name, value) => {
     let error = '';
@@ -142,23 +152,16 @@ const TripForm = ({ onTripCreated }) => {
         current_cycle_used: Number(formData.current_cycle_used)
       };
       
-      // Submit to API
-      const createdTrip = await tripService.createTrip(submissionData);
+      // Create new trip
+      const result = await tripService.createTrip(submissionData);
       
-      // Reset form
-      setFormData({
-        current_location: '',
-        pickup_location: '',
-        dropoff_location: '',
-        current_cycle_used: 0
-      });
-      
-      setFormErrors({});
+      // Reset form after successful creation
+      resetForm();
       setSuccess('Trip created successfully!');
       
       // Call the callback if provided
       if (onTripCreated) {
-        onTripCreated(createdTrip);
+        onTripCreated(result);
       }
     } catch (err) {
       setError(err.message || 'Failed to create trip. Please try again.');
@@ -169,7 +172,7 @@ const TripForm = ({ onTripCreated }) => {
   
   return (
     <div className="trip-form-container">
-      <h2>Create New Trip</h2>
+      <h2>Plan Your Route</h2>
       
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
@@ -202,7 +205,7 @@ const TripForm = ({ onTripCreated }) => {
             onChange={handleChange}
             onBlur={handleBlur}
             required
-            placeholder="e.g. Detroit, MI"
+            placeholder="e.g. Milwaukee, WI"
           />
           {formErrors.pickup_location && (
             <div className="field-error">{formErrors.pickup_location}</div>
@@ -227,7 +230,7 @@ const TripForm = ({ onTripCreated }) => {
         </div>
         
         <div className={`form-group ${formErrors.current_cycle_used ? 'has-error' : ''}`}>
-          <label htmlFor="current_cycle_used">Current Cycle Used (hours):</label>
+          <label htmlFor="current_cycle_used">Current Cycle Hours Used:</label>
           <input
             type="number"
             id="current_cycle_used"
@@ -237,26 +240,33 @@ const TripForm = ({ onTripCreated }) => {
             onBlur={handleBlur}
             min="0"
             max="70"
-            step="1"
+            step="0.5"
             required
+            placeholder="0"
           />
-          <div className="field-hint">Maximum 70 hours (HOS regulations)</div>
           {formErrors.current_cycle_used && (
             <div className="field-error">{formErrors.current_cycle_used}</div>
           )}
+          <div className="field-hint">
+            Enter how many hours you've already driven in your current cycle (0-70)
+          </div>
         </div>
         
-        <button 
-          type="submit" 
-          className="submit-button" 
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <span className="button-with-loader">
-              <Loader /> <span>Creating...</span>
-            </span>
-          ) : 'Create Trip'}
-        </button>
+        <div className="form-actions">
+          <button 
+            type="submit" 
+            className="submit-button"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <span className="button-with-loader">
+                <Loader /> <span>Planning...</span>
+              </span>
+            ) : (
+              'Calculate Route & Logs'
+            )}
+          </button>
+        </div>
       </form>
     </div>
   );
