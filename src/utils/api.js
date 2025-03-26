@@ -68,10 +68,25 @@ export const tripService = {
   },
   
   // Get driver log PDF for a trip
-  getTripLog: async (id) => {
+  getTripLog: async (id, options = {}) => {
     try {
+      // Build query parameters including optional fields
+      const { 
+        carrierName = '', 
+        officeAddress = '', 
+        vehicleNumber = '', 
+        coDriverName = '' 
+      } = options;
+      
+      // Build query params string
+      let queryParams = `?trip_id=${id}`;
+      if (carrierName) queryParams += `&carrier_name=${encodeURIComponent(carrierName)}`;
+      if (officeAddress) queryParams += `&office_address=${encodeURIComponent(officeAddress)}`;
+      if (vehicleNumber) queryParams += `&vehicle_number=${encodeURIComponent(vehicleNumber)}`;
+      if (coDriverName) queryParams += `&co_driver_name=${encodeURIComponent(coDriverName)}`;
+      
       // Use the standard axios client for JSON response
-      const response = await apiClient.get(`/generate_log/?trip_id=${id}`);
+      const response = await apiClient.get(`/generate_log/${queryParams}`);
       
       // Return the base64 data and filename
       return {
