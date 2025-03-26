@@ -274,107 +274,127 @@ const RouteMap = ({ trip }) => {
         </MapContainer>
       </div>
 
-      <div className="route-info-sidebar">
-        <h3>Route Information</h3>
-        <div className="route-info-item">
-          <div className="route-label">
-            <div className="route-dot route-dot-blue"></div>
-            <span>Current to Pickup:</span>
-          </div>
-          <div className="route-value">
-            <div>{routeData && formatDistance(routeData.toPickup.distance)}</div>
-            <div>{routeData && formatDuration(routeData.toPickup.duration)}</div>
-          </div>
-        </div>
-        
-        <div className="route-info-item">
-          <div className="route-label">
-            <div className="route-dot route-dot-green"></div>
-            <span>Pickup to Dropoff:</span>
-          </div>
-          <div className="route-value">
-            <div>{routeData && formatDistance(routeData.toDropoff.distance)}</div>
-            <div>{routeData && formatDuration(routeData.toDropoff.duration)}</div>
-          </div>
-        </div>
-        
-        <div className="route-info-total">
-          <div className="route-label">
-            <span>Total Journey:</span>
-          </div>
-          <div className="route-value">
-            <div>{routeData && formatDistance(routeData.totalDistance)}</div>
-            <div>{routeData && formatDuration(routeData.totalDuration)}</div>
-          </div>
-        </div>
-        
-        {/* HOS Information */}
+      <div className="sidebar-container">
+        {/* HOS Information - Moved to the sidebar */}
         {hosData && (
-          <>
-            <h3 className="hos-info-title">Hours of Service</h3>
+          <div className="hos-container sidebar-section">
+            <h3 className="sidebar-section-title">Hours of Service</h3>
             
-            {/* Required breaks */}
-            {breakPoints.length > 0 && (
-              <div className="hos-section">
-                <h4>Required Breaks</h4>
-                {breakPoints.map((point, index) => (
-                  <div key={`break-info-${index}`} className="hos-info-item">
-                    <div className="hos-label">
-                      <div className="marker-dot marker-dot-orange"></div>
-                      <span>Break {index + 1}:</span>
-                    </div>
-                    <div className="hos-value">
-                      <div>{formatDateTime(point.startTime)}</div>
-                      <div>{formatDuration((point.endTime - point.startTime) / 60000)}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {/* Required rest periods */}
-            {restPoints.length > 0 && (
-              <div className="hos-section">
-                <h4>Required Rest Periods</h4>
-                {restPoints.map((point, index) => (
-                  <div key={`rest-info-${index}`} className="hos-info-item">
-                    <div className="hos-label">
-                      <div className="marker-dot marker-dot-purple"></div>
-                      <span>Rest {index + 1}:</span>
-                    </div>
-                    <div className="hos-value">
-                      <div>{formatDateTime(point.startTime)}</div>
-                      <div>{formatDuration((point.endTime - point.startTime) / 60000)}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {/* HOS Compliance Status */}
-            <div className="hos-section">
+            {/* HOS Compliance Status - Always visible */}
+            <div className="hos-section hos-compliance-section">
               <h4>HOS Compliance</h4>
-              <div className="compliance-item">
-                <span>70-Hour Cycle: </span>
-                <span className={`compliance-status ${hosData.cycle_compliant ? 'compliant' : 'non-compliant'}`}>
-                  {hosData.cycle_compliant ? 'Compliant' : 'Non-compliant'}
-                </span>
-              </div>
-              <div className="compliance-item">
-                <span>11-Hour Driving Limit: </span>
-                <span className={`compliance-status ${hosData.driving_compliant ? 'compliant' : 'non-compliant'}`}>
-                  {hosData.driving_compliant ? 'Compliant' : 'Non-compliant'}
-                </span>
-              </div>
-              <div className="compliance-item">
-                <span>14-Hour Duty Window: </span>
-                <span className={`compliance-status ${hosData.duty_window_compliant ? 'compliant' : 'non-compliant'}`}>
-                  {hosData.duty_window_compliant ? 'Compliant' : 'Non-compliant'}
-                </span>
+              <div className="compliance-grid">
+                <div className="compliance-item">
+                  <span>70-Hour Cycle: </span>
+                  <span className={`compliance-status ${hosData.cycle_compliant ? 'compliant' : 'non-compliant'}`}>
+                    {hosData.cycle_compliant ? 'Compliant' : 'Non-compliant'}
+                  </span>
+                </div>
+                <div className="compliance-item">
+                  <span>11-Hour Driving: </span>
+                  <span className={`compliance-status ${hosData.driving_compliant ? 'compliant' : 'non-compliant'}`}>
+                    {hosData.driving_compliant ? 'Compliant' : 'Non-compliant'}
+                  </span>
+                </div>
+                <div className="compliance-item">
+                  <span>14-Hour Window: </span>
+                  <span className={`compliance-status ${hosData.duty_window_compliant ? 'compliant' : 'non-compliant'}`}>
+                    {hosData.duty_window_compliant ? 'Compliant' : 'Non-compliant'}
+                  </span>
+                </div>
               </div>
             </div>
-          </>
+            
+            {/* Collapsible sections for breaks and rest periods */}
+            <div className="hos-collapsible-sections">
+              {/* Required breaks - Collapsible */}
+              {breakPoints.length > 0 && (
+                <details className="hos-collapsible">
+                  <summary className="hos-collapsible-header">
+                    <h4>Required Breaks ({breakPoints.length})</h4>
+                  </summary>
+                  <div className="hos-collapsible-content">
+                    {breakPoints.map((point, index) => (
+                      <div key={`break-info-${index}`} className="hos-info-item">
+                        <div className="hos-label">
+                          <div className="marker-dot marker-dot-orange"></div>
+                          <span>Break {index + 1}:</span>
+                        </div>
+                        <div className="hos-value">
+                          <div>{formatDateTime(point.startTime)}</div>
+                          <div>{formatDuration((point.endTime - point.startTime) / 60000)}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
+              
+              {/* Required rest periods - Collapsible */}
+              {restPoints.length > 0 && (
+                <details className="hos-collapsible">
+                  <summary className="hos-collapsible-header">
+                    <h4>Required Rest Periods ({restPoints.length})</h4>
+                  </summary>
+                  <div className="hos-collapsible-content">
+                    {restPoints.map((point, index) => (
+                      <div key={`rest-info-${index}`} className="hos-info-item">
+                        <div className="hos-label">
+                          <div className="marker-dot marker-dot-purple"></div>
+                          <span>Rest {index + 1}:</span>
+                        </div>
+                        <div className="hos-value">
+                          <div>{formatDateTime(point.startTime)}</div>
+                          <div>{formatDuration((point.endTime - point.startTime) / 60000)}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              )}
+            </div>
+          </div>
         )}
+      </div>
+      
+      {/* Route Information - Moved below the map */}
+      <div className="below-map-section">
+        <div className="route-info-container">
+          <h3>Route Information</h3>
+          <div className="route-info-grid">
+            <div className="route-info-item">
+              <div className="route-label">
+                <div className="route-dot route-dot-blue"></div>
+                <span>Current to Pickup:</span>
+              </div>
+              <div className="route-value">
+                <div>{routeData && formatDistance(routeData.toPickup.distance)}</div>
+                <div>{routeData && formatDuration(routeData.toPickup.duration)}</div>
+              </div>
+            </div>
+            
+            <div className="route-info-item">
+              <div className="route-label">
+                <div className="route-dot route-dot-green"></div>
+                <span>Pickup to Dropoff:</span>
+              </div>
+              <div className="route-value">
+                <div>{routeData && formatDistance(routeData.toDropoff.distance)}</div>
+                <div>{routeData && formatDuration(routeData.toDropoff.duration)}</div>
+              </div>
+            </div>
+            
+            <div className="route-info-total">
+              <div className="route-label">
+                <span>Total Journey:</span>
+              </div>
+              <div className="route-value">
+                <div>{routeData && formatDistance(routeData.totalDistance)}</div>
+                <div>{routeData && formatDuration(routeData.totalDuration)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

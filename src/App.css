@@ -1,7 +1,7 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
 }
 
@@ -125,6 +125,9 @@ button {
   color: var(--text-light);
   padding: 1rem 0;
   box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .app-header h1 {
@@ -135,6 +138,7 @@ button {
 .app-content {
   flex: 1;
   padding: 2rem 0;
+  margin-top: 1rem;
 }
 
 .app-footer {
@@ -690,21 +694,47 @@ button {
 /* Route Map Styles */
 .route-map-container {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 7fr 3fr;
+  grid-template-rows: auto auto;
   gap: 1.5rem;
 }
 
-@media (min-width: 992px) {
+@media (max-width: 991px) {
   .route-map-container {
-    grid-template-columns: 7fr 3fr;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
   }
 }
 
 .map-wrapper {
+  grid-column: 1;
+  grid-row: 1;
   height: 500px;
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+}
+
+.sidebar-container {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.below-map-section {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+@media (max-width: 991px) {
+  .sidebar-container {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .below-map-section {
+    grid-column: 1;
+    grid-row: 3;
+  }
 }
 
 .map-loading, .no-map-data {
@@ -718,14 +748,15 @@ button {
   font-size: 1.1rem;
 }
 
-.route-info-sidebar {
+/* Route info section */
+.route-info-container {
   background-color: #f8f9ff;
   padding: 1.5rem;
   border-radius: var(--border-radius-sm);
-  height: fit-content;
+  box-shadow: var(--shadow-sm);
 }
 
-.route-info-sidebar h3 {
+.route-info-container h3 {
   color: var(--primary-color);
   font-size: 1.2rem;
   margin-bottom: 1.25rem;
@@ -733,11 +764,16 @@ button {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.route-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
 .route-info-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
 }
@@ -746,10 +782,10 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-top: 1.5rem;
   padding-top: 1rem;
   border-top: 2px solid rgba(0, 0, 0, 0.1);
   font-weight: 600;
+  grid-column: 1 / -1;
 }
 
 .route-label {
@@ -828,21 +864,46 @@ button {
   color: #9c27b0;
 }
 
-/* HOS information styling */
-.hos-info-title {
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 2px solid rgba(0, 0, 0, 0.08);
+/* Sidebar and HOS section */
+.sidebar-section {
+  background-color: #f8f9ff;
+  padding: 1.5rem;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+}
+
+.sidebar-section-title {
   color: var(--primary-color);
   font-size: 1.2rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* HOS information styling */
+.hos-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .hos-section {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   padding: 15px;
   background-color: #f8f9ff;
   border-radius: var(--border-radius-sm);
   border-left: 3px solid var(--primary-color);
+}
+
+.hos-compliance-section {
+  margin-bottom: 5px;
+}
+
+.compliance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
 }
 
 .hos-section h4 {
@@ -883,6 +944,58 @@ button {
 
 .marker-dot-purple {
   background-color: #9c27b0;
+}
+
+/* Collapsible sections for HOS data */
+.hos-collapsible-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hos-collapsible {
+  background-color: #f8f9ff;
+  border-radius: var(--border-radius-sm);
+  border-left: 3px solid var(--primary-color);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.hos-collapsible-header {
+  padding: 10px 15px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  list-style: none;
+}
+
+.hos-collapsible-header::marker,
+.hos-collapsible-header::-webkit-details-marker {
+  display: none;
+}
+
+.hos-collapsible-header:after {
+  content: '+';
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  transition: transform 0.3s ease;
+}
+
+.hos-collapsible[open] .hos-collapsible-header:after {
+  content: '−';
+}
+
+.hos-collapsible h4 {
+  margin: 0;
+  display: inline-block;
+}
+
+.hos-collapsible-content {
+  padding: 0 15px 15px;
 }
 
 /* HOS compliance status */
